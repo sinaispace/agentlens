@@ -195,6 +195,7 @@ function parseSessionFile(file: string, redact: boolean): CollectedSession | nul
         outputTokens: num(u.output_tokens),
         cacheReadTokens: num(u.cache_read_input_tokens),
         cacheWriteTokens: num(u.cache_creation_input_tokens),
+        ...cacheSplit(u),
         body: redact || !text ? null : { response: text },
       });
 
@@ -241,6 +242,23 @@ function parseSessionFile(file: string, redact: boolean): CollectedSession | nul
 function normaliseModel(m: unknown): string | null {
   if (typeof m !== "string" || m.length === 0) return null;
   return m === SYNTHETIC_MODEL ? null : m;
+}
+
+/**
+ * Claude Code reports the cache-write TTL breakdown under `usage.cache_creation`.
+ * Carrying it through keeps pricing honest: a 1-hour write costs 2x input where
+ * a 5-minute write costs 1.25x.
+ */
+function cacheSplit(u: Record<string, unknown>): {
+  cacheWrite5mTokens?: number;
+  cacheWrite1hTokens?: number;
+} {
+  const c = u.cache_creation as Record<string, unknown> | undefined;
+  if (!c || typeof c !== "object") return {};
+  return {
+    cacheWrite5mTokens: num(c.ephemeral_5m_input_tokens),
+    cacheWrite1hTokens: num(c.ephemeral_1h_input_tokens),
+  };
 }
 
 function num(v: unknown): number {

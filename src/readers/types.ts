@@ -20,6 +20,9 @@ export type CollectedEvent = {
   outputTokens?: number;
   cacheReadTokens?: number;
   cacheWriteTokens?: number;
+  /** 1-hour cache writes cost 2x input vs 1.25x for 5-minute — split matters. */
+  cacheWrite5mTokens?: number;
+  cacheWrite1hTokens?: number;
   toolName?: string | null;
   toolOk?: boolean | null;
   durationMs?: number | null;
