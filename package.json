@@ -9,7 +9,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20.9.0"
@@ -28,8 +29,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sinaispace/agentlens.git",
-    "directory": "packages/collector"
+    "url": "git+https://github.com/sinaispace/agentlens.git"
   },
   "homepage": "https://agentlens.sinaispace.com",
   "bugs": {
