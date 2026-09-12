@@ -68,8 +68,11 @@ Agents that write session logs locally are detected automatically:
 |---|---|
 | Claude Code | `~/.claude/projects` |
 | Codex CLI | `~/.codex/sessions` |
+| Gemini CLI | `~/.gemini/tmp/<project>/chats` |
+| OpenCode | `~/.local/share/opencode/opencode.db` (SQLite, read-only) |
 
-More connectors are landing — Gemini CLI and OpenCode next.
+Reading OpenCode needs Node 22+ for the built-in `node:sqlite`. On older Node
+the other connectors still work.
 
 Agents that only report at organisation level (GitHub Copilot, Cursor,
 Windsurf, Amp) cannot be detected from a developer machine. Those are connected

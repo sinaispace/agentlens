@@ -1,4 +1,18 @@
 #!/usr/bin/env node
+/**
+ * Node prints an ExperimentalWarning to stderr the first time `node:sqlite` is
+ * loaded, which the OpenCode reader needs. It lands in the middle of the sync
+ * output and reads like a fault in AgentLens. Only that one warning is
+ * filtered — everything else Node has to say still gets through.
+ */
+const emitWarning = process.emitWarning;
+process.emitWarning = ((warning: string | Error, ...rest: unknown[]) => {
+  const text = typeof warning === "string" ? warning : warning?.message;
+  const type = typeof rest[0] === "string" ? rest[0] : undefined;
+  if (type === "ExperimentalWarning" && /SQLite/i.test(text ?? "")) return;
+  return (emitWarning as (...a: unknown[]) => void)(warning, ...rest);
+}) as typeof process.emitWarning;
+
 import { connect } from "./commands/connect.js";
 import { status } from "./commands/status.js";
 import { sync } from "./commands/sync.js";
