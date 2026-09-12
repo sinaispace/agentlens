@@ -33,6 +33,33 @@ npx @sinaispace/agentlens status    # what is connected, how far it has synced
 Re-syncing is always safe: the server deduplicates on session and event
 identity, so `--full` re-reads without creating duplicates.
 
+## Project mapping
+
+Put an `agentlens.yml` at your repo root and the collector applies it on every
+sync, before uploading — so newly declared projects attribute the very sessions
+that run is about to send, and sessions collected earlier are attributed too.
+
+```yaml
+team: platform-eng
+budget_usd: 2000
+
+projects:
+  payments-api:
+    repos: [org/payments-api]
+    budget_usd: 900
+  web-app:
+    repos: [org/web, org/design-system]
+```
+
+`repos` entries match the trailing path segments of a session's working
+directory, so absolute paths differ safely between machines: a bare name
+(`payments-api`) matches the last segment, and `org/payments-api`
+disambiguates two repos that share a name.
+
+The file is found by walking up from wherever the command runs, stopping at the
+repo root. Reconciliation is additive — it never deletes a project or rule, so
+a colleague on a stale checkout cannot remove projects you just added.
+
 ## Supported agents
 
 Agents that write session logs locally are detected automatically:

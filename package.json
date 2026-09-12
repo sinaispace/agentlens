@@ -1,6 +1,6 @@
 {
   "name": "@sinaispace/agentlens",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AgentLens collector — reads local AI coding agent session logs and streams them to AgentLens. Read-only, no proxy, no model keys.",
   "license": "MIT",
   "type": "module",
@@ -16,7 +16,7 @@
     "node": ">=20.9.0"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node scripts/gen-version.mjs && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "npm run build"
   },
