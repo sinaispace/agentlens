@@ -1,5 +1,6 @@
-import { ApiError, upload } from "../api.js";
+import { ApiError, pushConfig, upload } from "../api.js";
 import { loadConfig, saveConfig } from "../config.js";
+import { findConfigFile } from "../config-file.js";
 import { detected } from "../readers/index.js";
 import type { CollectedSession } from "../readers/types.js";
 import { bold, dim, fail, ok, warn } from "../ui.js";
@@ -34,6 +35,10 @@ export async function sync(options: SyncOptions = {}): Promise<number> {
     warn("No supported agents found on this machine.");
     return 0;
   }
+
+  // Applied before sessions upload, so newly declared projects can attribute
+  // the very sessions this run is about to send.
+  if (!options.dryRun) await applyConfigFile(config.url, config.token);
 
   let totalSessions = 0;
   let totalEvents = 0;
@@ -112,6 +117,24 @@ export async function sync(options: SyncOptions = {}): Promise<number> {
     console.log(`\n${bold(verb)} ${totalSessions} sessions · ${totalEvents} events ${target}`);
   }
   return failed ? 1 : 0;
+}
+
+/** Best effort: a malformed agentlens.yml must not block telemetry upload. */
+async function applyConfigFile(url: string, token: string): Promise<void> {
+  const found = findConfigFile();
+  if (!found) return;
+
+  try {
+    const r = await pushConfig(url, token, found.text);
+    const parts = [
+      r.projectsCreated ? `${r.projectsCreated} created` : null,
+      r.projectsUpdated ? `${r.projectsUpdated} updated` : null,
+      r.sessionsAttributed ? `${r.sessionsAttributed} sessions attributed` : null,
+    ].filter(Boolean);
+    ok(`${"agentlens.yml".padEnd(14)} ${parts.length ? parts.join(", ") : "no changes"}`);
+  } catch (err) {
+    warn(`agentlens.yml not applied — ${msg(err)}`);
+  }
 }
 
 async function withRetry<T>(fn: () => Promise<T>): Promise<T> {

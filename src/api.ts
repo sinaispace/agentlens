@@ -39,6 +39,47 @@ export async function upload(
   return (await res.json()) as IngestResponse;
 }
 
+export type ConfigResponse = {
+  ok: true;
+  teamSlug: string | null;
+  projectsCreated: number;
+  projectsUpdated: number;
+  reposLinked: number;
+  sessionsAttributed: number;
+};
+
+/** Sends agentlens.yml as raw text — it is parsed server-side. */
+export async function pushConfig(
+  url: string,
+  token: string,
+  text: string,
+): Promise<ConfigResponse> {
+  let res: Response;
+  try {
+    res = await fetch(`${url}/api/config`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}`, "content-type": "text/yaml" },
+      body: text,
+    });
+  } catch (err) {
+    throw new ApiError(
+      `Could not reach ${url}: ${err instanceof Error ? err.message : String(err)}`,
+      0,
+      true,
+    );
+  }
+
+  if (!res.ok) {
+    const detail = await res
+      .json()
+      .then((j) => (j as { error?: string })?.error)
+      .catch(() => null);
+    throw new ApiError(detail || `Config rejected with ${res.status}`, res.status, res.status >= 500);
+  }
+
+  return (await res.json()) as ConfigResponse;
+}
+
 async function request(
   endpoint: string,
   token: string,
