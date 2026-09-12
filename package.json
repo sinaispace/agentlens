@@ -1,6 +1,6 @@
 {
   "name": "@sinaispace/agentlens",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "AgentLens collector — reads local AI coding agent session logs and streams them to AgentLens. Read-only, no proxy, no model keys.",
   "license": "MIT",
   "type": "module",

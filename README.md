@@ -67,8 +67,9 @@ Agents that write session logs locally are detected automatically:
 | Agent | Location |
 |---|---|
 | Claude Code | `~/.claude/projects` |
+| Codex CLI | `~/.codex/sessions` |
 
-More connectors are landing — Codex CLI, Gemini CLI and OpenCode next.
+More connectors are landing — Gemini CLI and OpenCode next.
 
 Agents that only report at organisation level (GitHub Copilot, Cursor,
 Windsurf, Amp) cannot be detected from a developer machine. Those are connected
