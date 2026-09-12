@@ -1,4 +1,6 @@
+import { ApiError, remoteStatus } from "../api.js";
 import { configPath, loadConfig } from "../config.js";
+import { findConfigFile } from "../config-file.js";
 import { detected, readers } from "../readers/index.js";
 import { bold, dim, warn } from "../ui.js";
 
@@ -28,5 +30,34 @@ export async function status(): Promise<number> {
     );
   }
 
+  const file = findConfigFile();
+  console.log(`  config file ${file ? file.path : dim("no agentlens.yml found")}`);
+
+  // Workspace-side numbers live on the server, so this is a network call — a
+  // failure here should degrade the output, not fail the command.
+  try {
+    const r = await remoteStatus(config.url, config.token);
+    console.log("");
+    console.log(`  projects    ${r.projects} mapped across ${r.teams} team${r.teams === 1 ? "" : "s"}`);
+    console.log(`  sessions    ${r.sessionsMtd} this month`);
+    const budget = r.budgetUsd > 0 ? ` / ${usd(r.budgetUsd)}` : "";
+    console.log(`  spend MTD   ${usd(r.spendMtd)}${budget}`);
+    if (r.budgetUsd > 0 && r.spendMtd >= r.budgetUsd * 0.8) {
+      const pct = Math.round((r.spendMtd / r.budgetUsd) * 100);
+      warn(`  budget      ${pct}% of the monthly cap used`);
+    }
+  } catch (err) {
+    console.log("");
+    warn(
+      err instanceof ApiError && err.status === 401
+        ? "token rejected — it may have been revoked"
+        : `could not reach ${config.url}`,
+    );
+  }
+
   return 0;
+}
+
+function usd(n: number): string {
+  return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }

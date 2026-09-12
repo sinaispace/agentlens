@@ -80,6 +80,25 @@ export async function pushConfig(
   return (await res.json()) as ConfigResponse;
 }
 
+export type StatusResponse = {
+  ok: true;
+  agents: number;
+  projects: number;
+  teams: number;
+  sessionsMtd: number;
+  spendMtd: number;
+  budgetUsd: number;
+};
+
+/** Workspace-side status for `agentlens status`. */
+export async function remoteStatus(
+  url: string,
+  token: string,
+): Promise<StatusResponse> {
+  const res = await request(`${url}/api/status`, token, "GET");
+  return (await res.json()) as StatusResponse;
+}
+
 async function request(
   endpoint: string,
   token: string,
