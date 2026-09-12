@@ -28,12 +28,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/m-shirt/agentlens.git",
+    "url": "git+https://github.com/sinaispace/agentlens.git",
     "directory": "packages/collector"
   },
   "homepage": "https://agentlens.sinaispace.com",
   "bugs": {
-    "url": "https://github.com/m-shirt/agentlens/issues"
+    "url": "https://github.com/sinaispace/agentlens/issues"
   },
   "publishConfig": {
     "access": "public"
